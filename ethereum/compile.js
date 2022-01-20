@@ -20,5 +20,3 @@ for (let contract in output) {
   );
   console.log(`${contract.substring(1)}.json created in builds folder.`);
 }
-
-// module.exports =
