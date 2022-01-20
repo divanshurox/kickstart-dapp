@@ -3,8 +3,8 @@ const fs = require("fs-extra");
 const solc = require("solc");
 
 const buildPath = path.resolve(__dirname, "build");
-console.log("Build folder deleted.");
 fs.removeSync(buildPath);
+console.log("Build folder deleted.");
 
 const contractPath = path.resolve(__dirname, "contracts", "Campaign.sol");
 const contractContent = fs.readFileSync(contractPath, "utf8");
