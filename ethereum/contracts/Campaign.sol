@@ -27,7 +27,7 @@ contract Campaign{
     uint public minContribution;
     Request[] public requests;
     mapping(address => bool) public approvers;
-    uint approversCount;
+    uint public approversCount;
 
     modifier restricted() {
         require(msg.sender == manager);
@@ -66,7 +66,7 @@ contract Campaign{
         require(!requests[idx].approvals[msg.sender]);
         Request storage latestRequest = requests[idx];
         latestRequest.approvals[msg.sender]=true;
-        latestRequest.approvalCount++;  
+        latestRequest.approvalCount++;
     } 
 
     function finalizeRequest(uint idx) public restricted {
