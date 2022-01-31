@@ -26,14 +26,14 @@ const NewCampaign = () => {
       await factory.methods.createCampaign(minContrib).send({
         from: accounts[0],
       });
+      setLoading(false);
+      router.replace("/");
     } catch (e) {
       setError(e.message);
       setInterval(() => {
         setError(null);
       }, 2000);
     }
-    setLoading(false);
-    router.replace("/");
   };
 
   return (

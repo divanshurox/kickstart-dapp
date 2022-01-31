@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../../../../components/Layout";
 import getCampaign from "../../../../ethereum/campaign";
-import { Table, Button } from "semantic-ui-react";
+import { Table, Button, Message } from "semantic-ui-react";
 import RequestRow from "../../../../components/RequestRow";
 import Link from "next/link";
 import web3 from "../../../../ethereum/web3";
-const requests = ({ hash, req: requests, manager }) => {
+
+const requests = ({ hash, req: requests, manager, approversCount }) => {
   const [account, setAccount] = useState(null);
+  const [error, setError] = useState(false);
   useEffect(() => {
     const init = async () => {
       try {
@@ -19,8 +21,16 @@ const requests = ({ hash, req: requests, manager }) => {
     init();
   }, []);
   const { Header, HeaderCell, Row, Body } = Table;
+  console.log(approversCount);
   return (
     <Layout>
+      {error && (
+        <Message negative>
+          <Message.Header>
+            We're sorry but the request can't be approved right now!
+          </Message.Header>
+        </Message>
+      )}
       {account === manager && (
         <Link href={`/campaigns/${hash}/requests/new`}>
           <a>
@@ -42,7 +52,20 @@ const requests = ({ hash, req: requests, manager }) => {
         </Header>
         <Body>
           {requests.map((request, i) => {
-            return <RequestRow key={i} idx={i} request={request} />;
+            if (!request.complete || account === manager) {
+              return (
+                <RequestRow
+                  key={i}
+                  idx={i}
+                  request={request}
+                  hash={hash}
+                  approversCount={approversCount}
+                  setError={setError}
+                  account={account}
+                  manager={manager}
+                />
+              );
+            }
           })}
         </Body>
       </Table>
@@ -54,7 +77,7 @@ export async function getServerSideProps(context) {
   const { hash } = context.query;
   const campaign = getCampaign(hash);
   // cannot get appprovers count as of now
-  // const approversCount = await campaign.methods.approversCount().call();
+  const approversCount = await campaign.methods.approversCount().call();
   const requestCount = parseInt(
     await campaign.methods.getRequestsCount().call()
   );
@@ -76,6 +99,7 @@ export async function getServerSideProps(context) {
       hash,
       req,
       manager,
+      approversCount,
     },
   };
 }
